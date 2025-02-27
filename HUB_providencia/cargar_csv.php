@@ -121,6 +121,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['archivo_csv']) && $_F
 // Obtener historial de cargas para este administrador
 $historial_cargas = $db->search("cargas_csv", "id_admin = $admin_id ORDER BY fecha_carga DESC LIMIT 10");
 
+// Obtener los datos personales registrados - Limitado a 50 registros para no sobrecargar la página
+$datos_personales = $db->search("datos_personales", "1=1 ORDER BY Fecha DESC LIMIT 50");
+
 // Obtener nombre del administrador
 $nombre_admin = $_SESSION['admin_nombre'];
 ?>
@@ -133,6 +136,49 @@ $nombre_admin = $_SESSION['admin_nombre'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrador - HUB Providencia</title>
     <link rel="stylesheet" href="estilos.css">
+    <style>
+        /* Estilos adicionales para la tabla de datos personales */
+        .admin-section {
+            margin-bottom: 30px;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flex-item {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .admin-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .admin-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
 </head>
 
 <body>
@@ -171,34 +217,69 @@ $nombre_admin = $_SESSION['admin_nombre'];
                     </form>
                 </section>
 
-                <section class="admin-section">
-                    <h2>Historial de Cargas</h2>
+                <div class="flex-container">
+                    <section class="admin-section flex-item">
+                        <h2>Historial de Cargas</h2>
 
-                    <?php if ($historial_cargas): ?>
-                        <div class="table-responsive">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Archivo</th>
-                                        <th>Registros</th>
-                                        <th>Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($historial_cargas as $carga): ?>
+                        <?php if ($historial_cargas): ?>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($carga['nombre_archivo']); ?></td>
-                                            <td><?php echo $carga['registros_importados']; ?></td>
-                                            <td><?php echo date('d/m/Y H:i', strtotime($carga['fecha_carga'])); ?></td>
+                                            <th>Archivo</th>
+                                            <th>Registros</th>
+                                            <th>Fecha</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p>No hay cargas registradas aún.</p>
-                    <?php endif; ?>
-                </section>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($historial_cargas as $carga): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($carga['nombre_archivo']); ?></td>
+                                                <td><?php echo $carga['registros_importados']; ?></td>
+                                                <td><?php echo date('d/m/Y H:i', strtotime($carga['fecha_carga'])); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p>No hay cargas registradas aún.</p>
+                        <?php endif; ?>
+                    </section>
+
+                    <section class="admin-section flex-item">
+                        <h2>Datos Personales Registrados</h2>
+
+                        <?php if ($datos_personales): ?>
+                            <div class="table-responsive">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>RUT</th>
+                                            <th>Nombre</th>
+                                            <th>Correo</th>
+                                            <th>Celular</th>
+                                            <th>Fecha Registro</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($datos_personales as $persona): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($persona['Rut']); ?></td>
+                                                <td><?php echo htmlspecialchars($persona['Nombre']); ?></td>
+                                                <td><?php echo htmlspecialchars($persona['Correo']); ?></td>
+                                                <td><?php echo htmlspecialchars($persona['Celular']); ?></td>
+                                                <td><?php echo date('d/m/Y H:i', strtotime($persona['Fecha'])); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php else: ?>
+                            <p>No hay datos personales registrados aún.</p>
+                        <?php endif; ?>
+                    </section>
+                </div>
 
                 <div class="form-links">
                     <p><a href="index.php?logout=1" class="logout-link">Cerrar sesión</a></p>
