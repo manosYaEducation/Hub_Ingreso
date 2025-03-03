@@ -35,6 +35,37 @@ class DBconexion
         return false;
     }
 
+    // Función corregida para verificar sesión activa
+    public function verificarSesionActiva($rut)
+    {
+        // Usamos $this en lugar de crear una nueva instancia
+        $resultado = $this->search(
+            "registro_accesos_usuarios",
+            "rut_usuario = '$rut' AND sesion_activa = 1 AND fecha_acceso > DATE_SUB(NOW(), INTERVAL 8 HOUR)"
+        );
+        return !empty($resultado);
+    }
+
+    // Función para cerrar sesiones inactivas (más de 8 horas)
+    public function cerrarSesionesInactivas()
+    {
+        return $this->update(
+            "registro_accesos_usuarios",
+            "sesion_activa = 0",
+            "sesion_activa = 1 AND fecha_acceso < DATE_SUB(NOW(), INTERVAL 8 HOUR)"
+        );
+    }
+
+    // Función para cerrar sesiones de un usuario específico
+    public function cerrarSesionesUsuario($rut)
+    {
+        return $this->update(
+            "registro_accesos_usuarios",
+            "sesion_activa = 0",
+            "rut_usuario = '$rut' AND sesion_activa = 1"
+        );
+    }
+
     public function searchCount($tabla, $condicion)
     {
         $resultado = $this->conexion->query("SELECT COUNT(*) as total FROM $tabla WHERE $condicion") or die($this->conexion->error);

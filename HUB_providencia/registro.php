@@ -4,7 +4,7 @@ session_start();
 
 // Si ya hay una sesión activa de administrador, redirigir a la página de carga CSV
 if (isset($_SESSION['admin_id'])) {
-    header("Location: cargar_csv.php");
+    header("Location: panel_admin.php");
     exit;
 }
 $error = '';
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     // Actualizar último acceso
                     $db->update("administradores", "ultimo_acceso = '$fecha'", "id = " . $admin[0]['id']);
 
-                    header("Location: cargar_csv.php");
+                    header("Location: panel_admin.php");
                     exit;
                 } else {
                     $error = "Error al iniciar sesión. Por favor intente nuevamente.";
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $error = "Error al registrar el administrador. Por favor intente nuevamente.";
             }
         } else {
-            $error = "Este RUT ya está registrado como administrador. <a href='index.php'>Inicie sesión</a>";
+            $error = "Este RUT ya está registrado como administrador. <a href='login_admin.php'>Inicie sesión</a>";
         }
     }
 }
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </form>
 
                 <div class="form-links">
-                    <p>¿Ya está registrado? <a href="index.php">Inicie sesión</a></p>
+                    <p>¿Ya está registrado? <a href="login_admin.php">Inicie sesión</a></p>
                 </div>
             </div>
         </main>
